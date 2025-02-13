@@ -40,7 +40,7 @@ const Login = () => {
       dispatch(signInStart())
 
       const res = await axios.post(
-        "http://localhost:4000/api/auth/signin",
+        "https://echo-notes-backend.onrender.com/api/auth/signin",
         { email, password },
         { withCredentials: true }
       )
