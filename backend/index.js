@@ -22,12 +22,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://note-making-app-sigma.vercel.app",
+    origin: "*", // Allow all origins for now
     methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
   })
 );
+
 
 
 // import routes
