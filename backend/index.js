@@ -22,7 +22,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({ origin: ["https://note-making-app-sigma.vercel.app/"], credentials: true }))
 
-app.listen(3000, () => {
+app.listen(4000, () => {
   console.log("Server is running on port 3000")
 })
 
