@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
 import {
-  signInSuccess,
+  signoutSuccess,
   signoutFailure,
   signoutStart,
 } from "../redux/user/userSlice"
@@ -32,21 +32,22 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     try {
       dispatch(signoutStart())
 
-      const res = await axios.get("https://echo-notes-backend.onrender.com/api/auth/signout", {
-        withCredentials: true,
-      })
+      const res = await axios.post("https://echo-notes-backend.onrender.com/api/auth/signout", 
+        {}, 
+        { withCredentials: true }
+      )
 
-      if (res.data.success === false) {
+      if (!res.data.success) {
         dispatch(signoutFailure(res.data.message))
         toast.error(res.data.message)
         return
       }
 
+      dispatch(signoutSuccess()) // Corrected action
       toast.success(res.data.message)
-      dispatch(signInSuccess())
       navigate("/login")
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || "Logout failed")
       dispatch(signoutFailure(error.message))
     }
   }
