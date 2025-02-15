@@ -6,6 +6,9 @@ const router = express.Router()
 
 router.post("/signup", signup)
 router.post("/signin", signin)
-router.get("/signout", verifyToken, signout)
+router.post("/signout", (req, res) => {
+  res.clearCookie("access_token", { httpOnly: true, secure: true, sameSite: "None" })
+  return res.status(200).json({ success: true, message: "Logged out successfully" })
+})
 
 export default router
