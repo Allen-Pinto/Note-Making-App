@@ -44,6 +44,9 @@ const Home = () => {
     try {
       const res = await axios.get("https://echo-notes-backend.onrender.com/api/note/all", {
         withCredentials: true,
+          headers: {
+    Authorization: `Bearer ${token}`, 
+  },
       })
 
       if (res.data.success === false) {
@@ -70,7 +73,11 @@ const Home = () => {
     try {
       const res = await axios.delete(
         "https://echo-notes-backend.onrender.com/api/note/delete/" + noteId,
-        { withCredentials: true }
+        { withCredentials: true ,
+   headers: {
+    Authorization: `Bearer ${token}`, // Ensure token is sent
+  },
+        }
       )
 
       if (res.data.success === false) {
@@ -90,6 +97,9 @@ const Home = () => {
       const res = await axios.get("https://echo-notes-backend.onrender.com/api/note/search", {
         params: { query },
         withCredentials: true,
+          headers: {
+    Authorization: `Bearer ${token}`, 
+  },
       })
 
       if (res.data.success === false) {
@@ -117,7 +127,11 @@ const Home = () => {
       const res = await axios.put(
         "https://echo-notes-backend.onrender.com/api/note/update-note-pinned/" + noteId,
         { isPinned: !noteData.isPinned },
-        { withCredentials: true }
+        { withCredentials: true,
+          headers: {
+    Authorization: `Bearer ${token}`, 
+  },
+        }
       )
 
       if (res.data.success === false) {
