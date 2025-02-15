@@ -19,7 +19,11 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
       const res = await axios.post(
         "https://echo-notes-backend.onrender.com/api/note/edit/" + noteId,
         { title, content, tags },
-        { withCredentials: true }
+        { withCredentials: true ,
+          headers: {
+    Authorization: `Bearer ${token}`, 
+  },
+        }
       )
 
       console.log(res.data)
@@ -47,7 +51,11 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
       const res = await axios.post(
         "https://echo-notes-backend.onrender.com/api/note/add",
         { title, content, tags },
-        { withCredentials: true }
+        { withCredentials: true ,
+          headers: {
+    Authorization: `Bearer ${token}`, 
+  },
+        }
       )
 
       if (res.data.success === false) {
