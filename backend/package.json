@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "build": "babel src -d lib",
-    "test": "jest"
-  },
+"scripts": {
+  "start": "node index.js",
+  "build": "babel src -d lib",
+  "test": "jest"
+},
   "author": "",
   "license": "ISC",
   "description": "",
