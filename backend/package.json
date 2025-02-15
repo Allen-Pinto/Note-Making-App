@@ -4,9 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
+    "build": "babel src -d lib",
+    "test": "jest"
+  }
   "author": "",
   "license": "ISC",
   "description": "",
