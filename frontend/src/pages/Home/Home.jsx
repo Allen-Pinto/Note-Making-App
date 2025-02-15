@@ -38,24 +38,42 @@ const Home = () => {
   const token = currentUser?.token // Ensure token is defined
 
   // Fetch all notes
-  const getAllNotes = async () => {
-    try {
-      const res = await axios.get("https://echo-notes-backend.onrender.com/api/note/all", {
+const getAllNotes = async () => {
+  if (!token) {
+    console.log("Token is missing, redirecting to login...");
+    navigate("/login")
+    return
+  }
+
+  try {
+    console.log("Using token:", token) // Debugging token
+
+    const res = await axios.get(
+      "https://echo-notes-backend.onrender.com/api/note/all",
+      {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Ensure token is passed correctly
         },
-      })
-
-      if (res.data.success === false) {
-        console.log(res.data)
-        return
       }
-      setAllNotes(res.data.notes)
-    } catch (error) {
-      console.log(error)
+    )
+
+    if (res.data.success === false) {
+      console.log(res.data)
+      return
+    }
+    setAllNotes(res.data.notes)
+  } catch (error) {
+    console.log("Error fetching notes:", error)
+    if (error.response?.status === 403) {
+      toast.error("Session expired. Please log in again.")
+      navigate("/login") // Redirect to login if forbidden
+    } else {
+      toast.error(error.message)
     }
   }
+}
+
 
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" })
