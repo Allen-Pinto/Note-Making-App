@@ -25,12 +25,13 @@ app.use(cookieParser());
 
 // Define CORS options
 const corsOptions = {
-  origin: "*",  // Allow all origins for now
+  origin: "https://note-making-app-beige.vercel.app",  
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
   credentials: true,
-  preflightContinue: false, // Don't continue processing the preflight request
+  preflightContinue: false, 
 };
+
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
