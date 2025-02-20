@@ -25,7 +25,11 @@ app.use(cookieParser());
 
 // Define CORS options
 const corsOptions = {
-  origin: "https://note-making-app-beige.vercel.app",
+  origin: [
+    "https://note-making-app-sigma.vercel.app",
+    "https://note-making-app-beige.vercel.app",
+    "https://note-making-app-allen-pintos-projects.vercel.app"
+  ],
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
   credentials: true,
