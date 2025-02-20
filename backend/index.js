@@ -30,7 +30,7 @@ const corsOptions = {
       "https://note-making-app-beige.vercel.app",
       "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app",
       "https://note-making-3c533wuqw-allen-pintos-projects.vercel.app",
-      "https://note-making-jz3ddb07k-allen-pintos-projects.vercel.app", // Ensure this origin is included
+      "https://note-making-jz3ddb07k-allen-pintos-projects.vercel.app", // Added this new origin
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
