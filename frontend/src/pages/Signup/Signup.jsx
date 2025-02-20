@@ -6,7 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Signup = () => {
-  const [username, setName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -36,7 +36,7 @@ const Signup = () => {
     try {
       const res = await axios.post(
         "https://echo-notes-backend.onrender.com/api/auth/signup",
-        { username , email, password },
+        { name , email, password },
         { headers: { "Content-Type": "application/json" } }
       );
 
