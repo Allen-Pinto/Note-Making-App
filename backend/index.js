@@ -31,24 +31,15 @@ const corsOptions = {
   ],
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
-  credentials: true,
+  credentials: true, // Allow cookies with cross-origin requests
   preflightContinue: false,
 };
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Handle preflight requests for OPTIONS method
-app.options("*", cors(corsOptions));
-
-// Example route where you manually set CORS headers
+// Example route
 app.get("/", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Max-Age", "1800");
-  res.setHeader("Access-Control-Allow-Headers", "content-type");
-  res.setHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS");
-
   res.send("Welcome to the Note-Making App API!");
 });
 
