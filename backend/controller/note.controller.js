@@ -2,17 +2,18 @@ import Note from "../models/note.model.js"
 import { errorHandler } from "../utils/error.js"
 
 export const addNote = async (req, res, next) => {
-  const { title, content, tags, audioTranscribedText } = req.body
-  const { id } = req.user
+  const { title, content, tags, audioTranscribedText } = req.body;
+  const { id } = req.user;
 
   if (!title) {
-    return next(errorHandler(400, "Title is required"))
+    return next(errorHandler(400, "Title is required"));
   }
 
-  const noteContent = content || audioTranscribedText
+  // Use audioTranscribedText if available, otherwise fall back to content
+  const noteContent = audioTranscribedText || content;
 
   if (!noteContent) {
-    return next(errorHandler(400, "Content is required (text or audio)"))
+    return next(errorHandler(400, "Content or audio transcription is required"));
   }
 
   try {
@@ -21,54 +22,58 @@ export const addNote = async (req, res, next) => {
       content: noteContent,
       tags: tags || [],
       userId: id,
-    })
+    });
 
-    await note.save()
+    await note.save();
 
     res.status(201).json({
       success: true,
       message: "Note added successfully",
       note,
-    })
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 export const editNote = async (req, res, next) => {
-  const note = await Note.findById(req.params.noteId)
+  const note = await Note.findById(req.params.noteId);
 
   if (!note) {
-    return next(errorHandler(404, "Note not found"))
+    return next(errorHandler(404, "Note not found"));
   }
 
   if (req.user.id !== note.userId.toString()) {
-    return next(errorHandler(401, "You can only update your own note!"))
+    return next(errorHandler(401, "You can only update your own note!"));
   }
 
-  const { title, content, tags, isPinned, audioTranscribedText } = req.body
+  const { title, content, tags, isPinned, audioTranscribedText } = req.body;
 
   if (!title && !content && !tags && !audioTranscribedText) {
-    return next(errorHandler(400, "No changes provided"))
+    return next(errorHandler(400, "No changes provided"));
   }
 
   try {
-    if (title) note.title = title
-    if (content || audioTranscribedText) note.content = content || audioTranscribedText
-    if (tags) note.tags = tags
-    if (isPinned !== undefined) note.isPinned = isPinned
+    if (title) note.title = title;
+    // Use audioTranscribedText if provided, otherwise update content
+    if (audioTranscribedText) note.content = audioTranscribedText;
+    else if (content) note.content = content;
+    
+    if (tags) note.tags = tags;
+    if (isPinned !== undefined) note.isPinned = isPinned;
 
-    await note.save()
+    await note.save();
 
     res.status(200).json({
       success: true,
       message: "Note updated successfully",
       note,
-    })
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
 
 export const getAllNotes = async (req, res, next) => {
   const userId = req.user.id
