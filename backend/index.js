@@ -26,8 +26,9 @@ app.use(cookieParser());
 // Define CORS options
 const corsOptions = {
   origin: [
-    "https://note-making-app-beige.vercel.app",   // Add your valid front-end domains here
-    "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app", // New domain
+    "https://note-making-app-beige.vercel.app",
+    "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app",
+    "https://note-making-3c533wuqw-allen-pintos-projects.vercel.app", //Added correct origin.
   ],
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
