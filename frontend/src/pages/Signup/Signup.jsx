@@ -36,7 +36,7 @@ const Signup = () => {
 try {
   const res = await axios.post(
     "https://echo-notes-backend.onrender.com/api/auth/signup",
-    { name, email, password }, // ✅ Correct property names
+    { username:name, email, password }, // ✅ Correct property names
     { headers: { "Content-Type": "application/json" } }
   );
 
