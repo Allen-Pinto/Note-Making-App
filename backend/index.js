@@ -23,7 +23,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// Define CORS options
+const cors = require('cors');
 const corsOptions = {
   origin: "https://note-making-app-beige.vercel.app",  
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
@@ -33,7 +33,6 @@ const corsOptions = {
 };
 
 
-// Apply CORS middleware
 app.use(cors(corsOptions));
 
 // Handle preflight requests for OPTIONS method
