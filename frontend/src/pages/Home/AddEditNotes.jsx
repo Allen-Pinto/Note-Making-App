@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MdClose } from "react-icons/md";
-import TagInput from "../../components/Input/TagInput";
+import TagInput from "../../components/Input/TagInput.jsx";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
