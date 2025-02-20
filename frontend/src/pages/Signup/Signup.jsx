@@ -34,11 +34,11 @@ const Signup = () => {
     setError("");
 
 try {
-  const res = await axios.post(
-    "https://echo-notes-backend.onrender.com/api/auth/signup",
-    { username:name, email, password }, // ✅ Correct property names
-    { headers: { "Content-Type": "application/json" } }
-  );
+const res = await axios.post(
+  "https://echo-notes-backend.onrender.com/api/auth/signup",
+  { name, email, password }, 
+  { headers: { "Content-Type": "application/json" } }
+);
 
 
       if (!res.data.success) {
