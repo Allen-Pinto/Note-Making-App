@@ -30,10 +30,11 @@ const corsOptions = {
       "https://note-making-app-beige.vercel.app",
       "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app",
       "https://note-making-3c533wuqw-allen-pintos-projects.vercel.app",
+      "https://note-making-jz3ddb07k-allen-pintos-projects.vercel.app", // Ensure this origin is included
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true); // allow request from origin
+      callback(null, true); // Allow request
     } else {
       callback(new Error("Not allowed by CORS"));
     }
@@ -46,6 +47,9 @@ const corsOptions = {
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
+
+// Preflight response handling for OPTIONS requests
+app.options('*', cors(corsOptions));  // Explicitly handle OPTIONS requests
 
 // Example route
 app.get("/", (req, res) => {
