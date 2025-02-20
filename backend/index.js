@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import cors from "cors";  // Correct import of cors
+import cors from "cors";
 
 // Load environment variables
 dotenv.config();
@@ -25,7 +25,10 @@ app.use(cookieParser());
 
 // Define CORS options
 const corsOptions = {
-  origin: "https://note-making-app-beige.vercel.app",  
+  origin: [
+    "https://note-making-app-beige.vercel.app",   // Add your valid front-end domains here
+    "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app", // New domain
+  ],
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
   credentials: true,
