@@ -16,6 +16,7 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
   const [searchQuery, setSearchQuery] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [transcribedText, setTranscribedText] = useState("");
+  const [isSpeechRecognitionAvailable, setIsSpeechRecognitionAvailable] = useState(true);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -69,27 +70,44 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
   };
 
   // Set up Speech Recognition
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  const recognition =
+    typeof window !== "undefined" &&
+    (window.SpeechRecognition || window.webkitSpeechRecognition);
 
-  recognition.lang = "en-US";
-  recognition.interimResults = true;
-  recognition.maxAlternatives = 1;
+  useEffect(() => {
+    if (!recognition) {
+      setIsSpeechRecognitionAvailable(false); // If SpeechRecognition is not available
+      toast.error("Speech Recognition is not supported in your browser.");
+      return;
+    }
 
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    setTranscribedText(transcript);
-  };
+    const recognitionInstance = new recognition();
+    recognitionInstance.lang = "en-US";
+    recognitionInstance.interimResults = true;
+    recognitionInstance.maxAlternatives = 1;
 
-  recognition.onerror = (event) => {
-    toast.error("Error while recording: " + event.error);
-  };
+    recognitionInstance.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setTranscribedText(transcript);
+    };
+
+    recognitionInstance.onerror = (event) => {
+      toast.error("Error while recording: " + event.error);
+    };
+
+    // Clean up on unmount
+    return () => {
+      if (recognitionInstance) recognitionInstance.stop();
+    };
+  }, [recognition]);
 
   // Once the recording stops, create a note using the transcribed text
   useEffect(() => {
     if (transcribedText) {
       onCreateNoteWithText(transcribedText);  // Pass transcribed text to parent
+      setTranscribedText("");  // Clear transcribed text after use
     }
-  }, [transcribedText]);
+  }, [transcribedText, onCreateNoteWithText]);
 
   return (
     <div className="bg-white flex items-center justify-between px-6 py-2 drop-shadow">
@@ -107,11 +125,12 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
           handleSearch={handleSearch}
           onClearSearch={onClearSearch}
         />
-        
+
         {/* Microphone Icon */}
         <button
           onClick={handleRecording}
           className="text-2xl text-gray-500"
+          disabled={!isSpeechRecognitionAvailable} // Disable button if recognition is not available
         >
           {isRecording ? <MdMicOff /> : <MdMic />}
         </button>
