@@ -21,10 +21,9 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
     }
 
     try {
-      const url =
-        type === "edit"
-          ? `https://echo-notes-backend.onrender.com/api/note/edit/${noteData._id}`
-          : "https://echo-notes-backend.onrender.com/api/note/add";
+      const url = type === "edit"
+        ? `https://echo-notes-backend.onrender.com/api/note/edit/${noteData._id}`
+        : "https://echo-notes-backend.onrender.com/api/note/add";
 
       const method = type === "edit" ? "put" : "post"; // Use PUT for editing
 
@@ -33,7 +32,7 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
         url,
         data: { title, content, tags },
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -41,6 +40,7 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
 
       if (!res.data.success) {
         toast.error(res.data.message);
+        setError(res.data.message);
         return;
       }
 
@@ -49,16 +49,55 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
       onClose();
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
+      setError(error.response?.data?.message || "Something went wrong");
     }
   };
 
   return (
-    <div>
-      <button onClick={onClose}><MdClose /></button>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} />
-      <textarea value={content} onChange={(e) => setContent(e.target.value)} />
-      <TagInput tags={tags} setTags={setTags} />
-      <button onClick={handleSaveNote}>{type === "edit" ? "UPDATE" : "ADD"}</button>
+    <div className="relative">
+      <button
+        className="w-10 h-10 rounded-full flex items-center justify-center absolute -top-3 -right-3 hover:bg-slate-50"
+        onClick={onClose}
+      >
+        <MdClose className="text-xl text-slate-400" />
+      </button>
+
+      <div className="flex flex-col gap-2">
+        <label className="input-label text-red-400 uppercase">Title</label>
+        <input
+          type="text"
+          className="text-2xl text-slate-950 outline-none"
+          placeholder="Wake up at 6 a.m."
+          value={title}
+          onChange={({ target }) => setTitle(target.value)}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2 mt-4">
+        <label className="input-label text-red-400 uppercase">Content</label>
+        <textarea
+          type="text"
+          className="text-sm text-slate-950 outline-none bg-slate-50 p-2 rounded"
+          placeholder="Content..."
+          rows={10}
+          value={content}
+          onChange={({ target }) => setContent(target.value)}
+        />
+      </div>
+
+      <div className="mt-3">
+        <label className="input-label text-red-400 uppercase">Tags</label>
+        <TagInput tags={tags} setTags={setTags} />
+      </div>
+
+      {error && <p className="text-red-500 text-xs pt-4">{error}</p>}
+
+      <button
+        className="btn-primary font-medium mt-5 p-3"
+        onClick={handleSaveNote}
+      >
+        {type === "edit" ? "UPDATE" : "ADD"}
+      </button>
     </div>
   );
 };
