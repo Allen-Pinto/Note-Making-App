@@ -33,10 +33,14 @@ const corsOptions = {
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
   credentials: true,
+  preflightContinue: false, // Don't continue processing the preflight request
 };
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
+
+// Handle preflight requests for OPTIONS method
+app.options("*", cors(corsOptions));
 
 // Import routes
 import authRouter from "./routes/auth.route.js";
