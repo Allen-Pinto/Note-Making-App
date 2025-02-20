@@ -22,19 +22,20 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault()
 
+    // Validate the email
     if (!validateEmail(email)) {
       setError("Please enter a valid email address")
       return
     }
 
+    // Validate password
     if (!password) {
       setError("Please enter the password")
       return
     }
 
+    // Clear error before making the request
     setError("")
-
-    // Login API
 
     try {
       dispatch(signInStart())
@@ -45,18 +46,28 @@ const Login = () => {
         { withCredentials: true }
       )
 
+      // Check for success in response
       if (res.data.success === false) {
         toast.error(res.data.message)
-        console.log(res.data)
-        dispatch(signInFailure(data.message))
+        dispatch(signInFailure(res.data.message)) // Corrected from data.message
+        return
       }
 
+      // Success response
       toast.success(res.data.message)
       dispatch(signInSuccess(res.data))
       navigate("/")
     } catch (error) {
-      toast.error(error.message)
-      dispatch(signInFailure(error.message))
+      // Handle network or other errors
+      if (error.response) {
+        // Server responded with an error
+        toast.error(error.response.data.message || error.message)
+        dispatch(signInFailure(error.response.data.message || error.message))
+      } else {
+        // Network or other errors
+        toast.error("An error occurred while logging in")
+        dispatch(signInFailure("An error occurred while logging in"))
+      }
     }
   }
 
