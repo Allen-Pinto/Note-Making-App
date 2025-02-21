@@ -72,10 +72,10 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
       setTranscribedText(transcript);
     };
 
-    recognition.current.onerror = (event) => {
-      console.log(event.error); // Log the error
-      alert("There was an error with the speech recognition.");
-    };
+recognition.current.onerror = (event) => {
+  console.log('Speech recognition error:', event.error); // Log the error to console
+  alert(`Error with speech recognition: ${event.error}`);
+};
 
     recognition.current.onend = () => {
       setIsRecording(false);
