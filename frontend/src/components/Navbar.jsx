@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { MdMic, MdMicOff } from "react-icons/md";  // Microphone icons
+import React, { useState, useEffect, useRef } from "react";
+import { MdMic, MdMicOff } from "react-icons/md";
 import SearchBar from "./SearchBar/SearchBar";
 import ProfileInfo from "./Cards/ProfileInfo";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,96 +17,63 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
   const [isRecording, setIsRecording] = useState(false);
   const [transcribedText, setTranscribedText] = useState("");
   const [isSpeechRecognitionAvailable, setIsSpeechRecognitionAvailable] = useState(true);
-  const [recognition, setRecognition] = useState(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const handleSearch = () => {
-    if (searchQuery) {
-      onSearchNote(searchQuery);
-    }
-  };
-
-  const onClearSearch = () => {
-    setSearchQuery("");
-    handleClearSearch();
-  };
-
-  const onLogout = async () => {
-    try {
-      dispatch(signoutStart());
-
-      const res = await axios.post("https://echo-notes-backend.onrender.com/api/auth/signout", 
-        {}, 
-        { withCredentials: true }
-      );
-
-      if (!res.data.success) {
-        dispatch(signoutFailure(res.data.message));
-        toast.error(res.data.message);
-        return;
-      }
-
-      dispatch(signoutSuccess());
-      toast.success(res.data.message);
-      navigate("/login");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Logout failed");
-      dispatch(signoutFailure(error.message));
-    }
-  };
+  const recognitionRef = useRef(null); // Using ref to store recognition
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
       setIsSpeechRecognitionAvailable(false);
       toast.error("Speech Recognition is not supported in your browser.");
       return;
     }
 
-    const recognitionInstance = new SpeechRecognition();
-    recognitionInstance.lang = "en-US";
-    recognitionInstance.interimResults = false;
-    recognitionInstance.maxAlternatives = 1;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.lang = "en-US";
+    recognitionRef.current.interimResults = false;
+    recognitionRef.current.maxAlternatives = 1;
 
-    recognitionInstance.onresult = (event) => {
+    recognitionRef.current.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setTranscribedText(transcript);
     };
 
-    recognitionInstance.onerror = (event) => {
-      toast.error("Error while recording: " + event.error);
+    recognitionRef.current.onerror = (event) => {
+      toast.error("Speech recognition error: " + event.error);
     };
 
-    setRecognition(recognitionInstance);
-
     return () => {
-      recognitionInstance.abort();
+      recognitionRef.current = null; // Cleanup on unmount
     };
   }, []);
 
-  // Start/Stop Recording
   const handleRecording = () => {
-    if (!recognition) {
+    if (!recognitionRef.current) {
       toast.error("Speech Recognition is not initialized.");
       return;
     }
 
     if (isRecording) {
-      recognition.stop();
+      recognitionRef.current.stop();
       setIsRecording(false);
     } else {
-      recognition.start();
-      setIsRecording(true);
+      try {
+        recognitionRef.current.start();
+        setIsRecording(true);
+      } catch (error) {
+        toast.error("Error starting speech recognition.");
+        console.error(error);
+      }
     }
   };
 
-  // Once the recording stops, create a note using the transcribed text
   useEffect(() => {
     if (transcribedText) {
       onCreateNoteWithText(transcribedText);
-      setTranscribedText("");  // Clear transcribed text after use
+      setTranscribedText("");
     }
   }, [transcribedText, onCreateNoteWithText]);
 
@@ -123,21 +90,39 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
         <SearchBar
           value={searchQuery}
           onChange={({ target }) => setSearchQuery(target.value)}
-          handleSearch={handleSearch}
-          onClearSearch={onClearSearch}
+          handleSearch={() => onSearchNote(searchQuery)}
+          onClearSearch={() => {
+            setSearchQuery("");
+            handleClearSearch();
+          }}
         />
 
-        {/* Microphone Icon */}
         <button
           onClick={handleRecording}
           className="text-2xl text-gray-500"
-          disabled={!isSpeechRecognitionAvailable} // Disable button if recognition is not available
+          disabled={!isSpeechRecognitionAvailable}
         >
           {isRecording ? <MdMicOff /> : <MdMic />}
         </button>
       </div>
 
-      <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
+      <ProfileInfo userInfo={userInfo} onLogout={async () => {
+        try {
+          dispatch(signoutStart());
+          const res = await axios.post("https://echo-notes-backend.onrender.com/api/auth/signout", {}, { withCredentials: true });
+          if (!res.data.success) {
+            dispatch(signoutFailure(res.data.message));
+            toast.error(res.data.message);
+            return;
+          }
+          dispatch(signoutSuccess());
+          toast.success(res.data.message);
+          navigate("/login");
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Logout failed");
+          dispatch(signoutFailure(error.message));
+        }
+      }} />
     </div>
   );
 };
