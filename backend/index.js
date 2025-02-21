@@ -23,7 +23,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// Define allowed origins
+// Define allowed origins for CORS
 const allowedOrigins = [
   "https://note-making-app-beige.vercel.app",
   "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app",
@@ -32,7 +32,7 @@ const allowedOrigins = [
   "https://note-making-9lesyl1eo-allen-pintos-projects.vercel.app", // Added this missing origin
 ];
 
-// Define CORS options
+// CORS Options configuration
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -59,20 +59,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// Example route
+// Basic test route
 app.get("/", (req, res) => {
   res.send("Welcome to the Note-Making App API!");
 });
 
-// Import routes
+// Import Routes
 import authRouter from "./routes/auth.route.js";
 import noteRouter from "./routes/note.route.js";
 
-// API Routes
+// Define API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/note", noteRouter);
 
-// Error handling middleware
+// Global error handling middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
@@ -84,7 +84,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+// Start Server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
