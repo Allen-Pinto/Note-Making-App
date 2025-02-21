@@ -56,50 +56,49 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
     }
   };
 
+  // Set up Speech Recognition
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition; 
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+  } else {
+    setIsSpeechRecognitionAvailable(false);
+    toast.error("Speech Recognition is not supported in your browser.");
+  }
+
   // Start/Stop Recording
   const handleRecording = () => {
+    if (!recognition) return;  // Prevent errors if SpeechRecognition is unavailable
+
     if (isRecording) {
-      // Stop recording
       recognition.stop();
       setIsRecording(false);
     } else {
-      // Start recording
       recognition.start();
       setIsRecording(true);
     }
   };
 
-  // Set up Speech Recognition
-  const recognition =
-    typeof window !== "undefined" &&
-    (window.SpeechRecognition || window.webkitSpeechRecognition);
-
   useEffect(() => {
-    if (!recognition) {
-      setIsSpeechRecognitionAvailable(false); // If SpeechRecognition is not available
-      toast.error("Speech Recognition is not supported in your browser.");
-      return;
-    }
+    if (!recognition) return;
 
-    const recognitionInstance = new recognition();
-    recognitionInstance.lang = "en-US";
-    recognitionInstance.interimResults = true;
-    recognitionInstance.maxAlternatives = 1;
-
-    recognitionInstance.onresult = (event) => {
+    recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setTranscribedText(transcript);
     };
 
-    recognitionInstance.onerror = (event) => {
+    recognition.onerror = (event) => {
       toast.error("Error while recording: " + event.error);
     };
 
-    // Clean up on unmount
     return () => {
-      if (recognitionInstance) recognitionInstance.stop();
+      recognition.stop();  // Cleanup
     };
-  }, [recognition]);
+  }, []);
 
   // Once the recording stops, create a note using the transcribed text
   useEffect(() => {
