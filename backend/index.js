@@ -23,33 +23,41 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+// Define allowed origins
+const allowedOrigins = [
+  "https://note-making-app-beige.vercel.app",
+  "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app",
+  "https://note-making-3c533wuqw-allen-pintos-projects.vercel.app",
+  "https://note-making-jz3ddb07k-allen-pintos-projects.vercel.app",
+  "https://note-making-9lesyl1eo-allen-pintos-projects.vercel.app", // Added this missing origin
+];
+
 // Define CORS options
 const corsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      "https://note-making-app-beige.vercel.app",
-      "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app",
-      "https://note-making-3c533wuqw-allen-pintos-projects.vercel.app",
-      "https://note-making-jz3ddb07k-allen-pintos-projects.vercel.app", // Added this new origin
-    ];
-
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true); // Allow request
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
   methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
   allowedHeaders: "Content-Type, Authorization",
-  credentials: true, // Allow cookies with cross-origin requests
+  credentials: true, // Allow credentials (cookies)
   preflightContinue: false,
 };
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Preflight response handling for OPTIONS requests
-app.options('*', cors(corsOptions));  // Explicitly handle OPTIONS requests
+// Handle OPTIONS requests properly
+app.options("*", cors(corsOptions));
+
+// Manually set CORS headers for all responses
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 // Example route
 app.get("/", (req, res) => {
