@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Note Schema
 const noteSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -19,12 +20,12 @@ const noteSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',  // Assuming you have a User model to reference
+    ref: 'User',  
     required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now,  // Fixed the default value to be a function
+    default: Date.now,  
   },
 });
 
