@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import SearchBar from "./SearchBar/SearchBar"
 import ProfileInfo from "./Cards/ProfileInfo"
 import { Link, useNavigate } from "react-router-dom"
@@ -11,10 +11,8 @@ import {
 } from "../redux/user/userSlice"
 import axios from "axios"
 
-const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNote }) => {
+const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
   const [searchQuery, setSearchQuery] = useState("")
-  const [isRecording, setIsRecording] = useState(false)
-  const [recognition, setRecognition] = useState(null)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -53,46 +51,11 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNote }) => 
     }
   }
 
-  const startRecording = () => {
-    if (recognition) {
-      recognition.start()
-      setIsRecording(true)
-    }
-  }
-
-  const stopRecording = () => {
-    if (recognition) {
-      recognition.stop()
-      setIsRecording(false)
-    }
-  }
-
-  const handleTranscription = (event) => {
-    const transcript = event.results[0][0].transcript
-    onCreateNote && onCreateNote(transcript)
-  }
-
-  // Initialize Web Speech API
-  useEffect(() => {
-    if ('webkitSpeechRecognition' in window) {
-      const recognitionInstance = new webkitSpeechRecognition()
-      recognitionInstance.lang = 'en-US'
-      recognitionInstance.maxAlternatives = 1
-      recognitionInstance.continuous = false
-      recognitionInstance.interimResults = false
-      recognitionInstance.onresult = handleTranscription
-      recognitionInstance.onend = () => setIsRecording(false)
-      setRecognition(recognitionInstance)
-    } else {
-      toast.error("Web Speech API not supported in this browser.")
-    }
-  }, [])
-
   return (
     <div className="bg-white flex items-center justify-between px-6 py-2 drop-shadow">
       <Link to={"/"}>
         <h2 className="text-xl font-medium text-black py-2">
-          <span className="text-slate-500">Echo</span>
+          <span className="text-slate-500">Good</span>
           <span className="text-slate-900">Notes</span>
         </h2>
       </Link>
@@ -103,14 +66,6 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNote }) => 
         handleSearch={handleSearch}
         onClearSearch={onClearSearch}
       />
-
-      <button
-        className="ml-4 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none"
-        onClick={isRecording ? stopRecording : startRecording}
-        disabled={!recognition}
-      >
-        {isRecording ? "Stop Recording" : "Start Recording"}
-      </button>
 
       <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
     </div>
