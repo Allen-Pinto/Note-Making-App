@@ -32,7 +32,7 @@ const onLogout = async () => {
     dispatch(signoutStart());
 
     const res = await axios.post(
-      "http://localhost:3000/api/auth/signout",  
+      "https://echo-notes-backend.onrender.com/api/auth/signout",  
       {},  
       { withCredentials: true }
     );
