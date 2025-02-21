@@ -1,18 +1,17 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import SearchBar from "./SearchBar/SearchBar"
 import ProfileInfo from "./Cards/ProfileInfo"
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
-import {
-  signInSuccess,
-  signoutFailure,
-  signoutStart,
-} from "../redux/user/userSlice"
 import axios from "axios"
+import { signInSuccess, signoutFailure, signoutStart } from "../redux/user/userSlice"
 
 const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
   const [searchQuery, setSearchQuery] = useState("")
+  const [isRecording, setIsRecording] = useState(false)
+  const [transcribedText, setTranscribedText] = useState("")
+  const recognition = useRef(null)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -51,6 +50,62 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     }
   }
 
+  const startRecording = () => {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Speech recognition API is not supported by your browser.");
+      return;
+    }
+
+    const SpeechRecognition = window.webkitSpeechRecognition;
+    recognition.current = new SpeechRecognition();
+    recognition.current.lang = "en-US";
+    recognition.current.continuous = false;
+    recognition.current.interimResults = false;
+
+    recognition.current.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.current.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setTranscribedText(transcript);
+    };
+
+    recognition.current.onerror = (event) => {
+      alert("There was an error with the speech recognition.");
+    };
+
+    recognition.current.onend = () => {
+      setIsRecording(false);
+      createNote();
+    };
+
+    recognition.current.start();
+  };
+
+  const stopRecording = () => {
+    if (recognition.current) {
+      recognition.current.stop();
+    }
+  };
+
+  const createNote = async () => {
+    try {
+      if (transcribedText.trim()) {
+        const res = await axios.post(
+          "https://echo-notes-backend.onrender.com/api/notes", 
+          { text: transcribedText },
+          { withCredentials: true }
+        );
+        toast.success("Note created successfully!");
+      } else {
+        toast.error("No text transcribed.");
+      }
+    } catch (error) {
+      toast.error("Error creating note.");
+    }
+  };
+
   return (
     <div className="bg-white flex items-center justify-between px-6 py-2 drop-shadow">
       <Link to={"/"}>
@@ -68,8 +123,17 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
       />
 
       <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
-    </div>
-  )
-}
 
-export default Navbar
+      <div className="ml-4">
+        <button
+          onClick={isRecording ? stopRecording : startRecording}
+          className="p-2 bg-blue-500 text-white rounded"
+        >
+          {isRecording ? "Stop Recording" : "Start Recording"}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Navbar;
