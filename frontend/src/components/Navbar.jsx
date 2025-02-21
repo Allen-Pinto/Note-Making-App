@@ -27,32 +27,7 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     handleClearSearch()
   }
 
-const onLogout = async () => {
-  try {
-    dispatch(signoutStart());
-
-    const res = await axios.post(
-      "https://echo-notes-backend.onrender.com/api/auth/signout",  
-      {},  
-      { withCredentials: true }
-    );
-
-    if (res.data.success === false) {
-      dispatch(signoutFailure(res.data.message));
-      toast.error(res.data.message);
-      return;
-    }
-
-    toast.success(res.data.message);
-    dispatch(signInSuccess());
-    navigate("/login");
-  } catch (error) {
-    toast.error(error.message);
-    dispatch(signoutFailure(error.message));
-  }
-};
-
-  const startRecording = () => {
+    const startRecording = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech recognition API is not supported by your browser.");
       return;
@@ -96,6 +71,32 @@ recognition.current.onerror = (event) => {
       recognition.current.stop();
     }
   };
+  
+
+const onLogout = async () => {
+  try {
+    dispatch(signoutStart());
+
+    const res = await axios.post(
+      "https://echo-notes-backend.onrender.com/api/auth/signout",  
+      {},  
+      { withCredentials: true }
+    );
+
+    if (res.data.success === false) {
+      dispatch(signoutFailure(res.data.message));
+      toast.error(res.data.message);
+      return;
+    }
+
+    toast.success(res.data.message);
+    dispatch(signInSuccess());
+    navigate("/login");
+  } catch (error) {
+    toast.error(error.message);
+    dispatch(signoutFailure(error.message));
+  }
+};
 
   const createNote = async () => {
     try {
