@@ -59,7 +59,7 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     const SpeechRecognition = window.webkitSpeechRecognition;
     recognition.current = new SpeechRecognition();
     recognition.current.lang = "en-US";
-    recognition.current.continuous = false;
+    recognition.current.continuous = true; // Allow continuous recognition
     recognition.current.interimResults = false;
 
     recognition.current.onstart = () => {
@@ -67,11 +67,13 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     };
 
     recognition.current.onresult = (event) => {
+      console.log(event); // Log the event to see its structure
       const transcript = event.results[0][0].transcript;
       setTranscribedText(transcript);
     };
 
     recognition.current.onerror = (event) => {
+      console.log(event.error); // Log the error
       alert("There was an error with the speech recognition.");
     };
 
