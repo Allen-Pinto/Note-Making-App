@@ -17,6 +17,7 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
   const [isRecording, setIsRecording] = useState(false);
   const [transcribedText, setTranscribedText] = useState("");
   const [isSpeechRecognitionAvailable, setIsSpeechRecognitionAvailable] = useState(true);
+  const [recognition, setRecognition] = useState(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -56,23 +57,41 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
     }
   };
 
-  // Set up Speech Recognition
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition; 
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setIsSpeechRecognitionAvailable(false);
+      toast.error("Speech Recognition is not supported in your browser.");
+      return;
+    }
 
-  if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-  } else {
-    setIsSpeechRecognitionAvailable(false);
-    toast.error("Speech Recognition is not supported in your browser.");
-  }
+    const recognitionInstance = new SpeechRecognition();
+    recognitionInstance.lang = "en-US";
+    recognitionInstance.interimResults = false;
+    recognitionInstance.maxAlternatives = 1;
+
+    recognitionInstance.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setTranscribedText(transcript);
+    };
+
+    recognitionInstance.onerror = (event) => {
+      toast.error("Error while recording: " + event.error);
+    };
+
+    setRecognition(recognitionInstance);
+
+    return () => {
+      recognitionInstance.abort();
+    };
+  }, []);
 
   // Start/Stop Recording
   const handleRecording = () => {
-    if (!recognition) return;  // Prevent errors if SpeechRecognition is unavailable
+    if (!recognition) {
+      toast.error("Speech Recognition is not initialized.");
+      return;
+    }
 
     if (isRecording) {
       recognition.stop();
@@ -83,27 +102,10 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, onCreateNoteWithTex
     }
   };
 
-  useEffect(() => {
-    if (!recognition) return;
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setTranscribedText(transcript);
-    };
-
-    recognition.onerror = (event) => {
-      toast.error("Error while recording: " + event.error);
-    };
-
-    return () => {
-      recognition.stop();  // Cleanup
-    };
-  }, []);
-
   // Once the recording stops, create a note using the transcribed text
   useEffect(() => {
     if (transcribedText) {
-      onCreateNoteWithText(transcribedText);  // Pass transcribed text to parent
+      onCreateNoteWithText(transcribedText);
       setTranscribedText("");  // Clear transcribed text after use
     }
   }, [transcribedText, onCreateNoteWithText]);
