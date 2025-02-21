@@ -73,8 +73,13 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     };
 
 recognition.current.onerror = (event) => {
-  console.log('Speech recognition error:', event.error); // Log the error to console
-  alert(`Error with speech recognition: ${event.error}`);
+  console.log('Speech recognition error:', event.error);
+  if (event.error === "network") {
+    alert('Network error occurred. Retrying...');
+    setTimeout(() => startRecording(), 2000); // Retry after 2 seconds
+  } else {
+    alert(`Error with speech recognition: ${event.error}`);
+  }
 };
 
     recognition.current.onend = () => {
