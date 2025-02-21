@@ -27,28 +27,30 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     handleClearSearch()
   }
 
-  const onLogout = async () => {
-    try {
-      dispatch(signoutStart())
+const onLogout = async () => {
+  try {
+    dispatch(signoutStart());
 
-      const res = await axios.get("https://echo-notes-backend.onrender.com/api/auth/signout", {
-        withCredentials: true,
-      })
+    const res = await axios.post(
+      "http://localhost:3000/api/auth/signout",  
+      {},  
+      { withCredentials: true }
+    );
 
-      if (res.data.success === false) {
-        dispatch(signoutFailure(res.data.message))
-        toast.error(res.data.message)
-        return
-      }
-
-      toast.success(res.data.message)
-      dispatch(signInSuccess())
-      navigate("/login")
-    } catch (error) {
-      toast.error(error.message)
-      dispatch(signoutFailure(error.message))
+    if (res.data.success === false) {
+      dispatch(signoutFailure(res.data.message));
+      toast.error(res.data.message);
+      return;
     }
+
+    toast.success(res.data.message);
+    dispatch(signInSuccess());
+    navigate("/login");
+  } catch (error) {
+    toast.error(error.message);
+    dispatch(signoutFailure(error.message));
   }
+};
 
   const startRecording = () => {
     if (!("webkitSpeechRecognition" in window)) {
