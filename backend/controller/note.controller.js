@@ -47,16 +47,11 @@ export const editNote = async (req, res, next) => {
     return next(errorHandler(401, "You can only update your own note!"));
   }
 
-  const { title, content, tags, isPinned, audioTranscribedText } = req.body;
+  const { title, content, tags, isPinned } = req.body;
 
   if (!title && !content && !tags && !audioTranscribedText) {
     return next(errorHandler(400, "No changes provided"));
   }
-
-  try {
-    if (title) note.title = title;
-    if (audioTranscribedText) note.content = audioTranscribedText;
-    else if (content) note.content = content;
 
     if (tags) note.tags = tags;
     if (isPinned !== undefined) note.isPinned = isPinned;
