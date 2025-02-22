@@ -3,23 +3,21 @@ import { errorHandler } from "../utils/error.js";
 
 // Your existing controller code remains the same
 export const addNote = async (req, res, next) => {
-  const { title, content, tags, audioTranscribedText } = req.body;
+  const { title, content, tags } = req.body;
   const { id } = req.user;
 
   if (!title) {
     return next(errorHandler(400, "Title is required"));
   }
 
-  const noteContent = audioTranscribedText || content;
-
-  if (!noteContent) {
-    return next(errorHandler(400, "Content or audio transcription is required"));
+  if (!content) {
+    return next(errorHandler(400, "Content is required"));
   }
 
   try {
     const note = new Note({
       title,
-      content: noteContent,
+      content,
       tags: tags || [],
       userId: id,
     });
@@ -49,23 +47,20 @@ export const editNote = async (req, res, next) => {
 
   const { title, content, tags, isPinned } = req.body;
 
-  if (!title && !content && !tags && !audioTranscribedText) {
+  if (!title && !content && !tags) {
     return next(errorHandler(400, "No changes provided"));
   }
 
-    if (tags) note.tags = tags;
-    if (isPinned !== undefined) note.isPinned = isPinned;
+  if (tags) note.tags = tags;
+  if (isPinned !== undefined) note.isPinned = isPinned;
 
-    await note.save();
+  await note.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Note updated successfully",
-      note,
-    });
-  } catch (error) {
-    next(error);
-  }
+  res.status(200).json({
+    success: true,
+    message: "Note updated successfully",
+    note,
+  });
 };
 
 export const getAllNotes = async (req, res, next) => {
