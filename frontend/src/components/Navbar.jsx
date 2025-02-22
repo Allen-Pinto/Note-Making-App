@@ -27,52 +27,6 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     handleClearSearch()
   }
 
-    const startRecording = () => {
-    if (!("webkitSpeechRecognition" in window)) {
-      alert("Speech recognition API is not supported by your browser.");
-      return;
-    }
-
-    const SpeechRecognition = window.webkitSpeechRecognition;
-    recognition.current = new SpeechRecognition();
-    recognition.current.lang = "en-US";
-    recognition.current.continuous = true; // Allow continuous recognition
-    recognition.current.interimResults = false;
-
-    recognition.current.onstart = () => {
-      setIsRecording(true);
-    };
-
-    recognition.current.onresult = (event) => {
-      console.log(event); // Log the event to see its structure
-      const transcript = event.results[0][0].transcript;
-      setTranscribedText(transcript);
-    };
-
-recognition.current.onerror = (event) => {
-  console.log('Speech recognition error:', event.error);
-  if (event.error === "network") {
-    alert('Network error occurred. Retrying...');
-  } else {
-    alert(`Error with speech recognition: ${event.error}`);
-  }
-};
-
-    recognition.current.onend = () => {
-      setIsRecording(false);
-      createNote();
-    };
-
-    recognition.current.start();
-  };
-
-  const stopRecording = () => {
-    if (recognition.current) {
-      recognition.current.stop();
-    }
-  };
-  
-
 const onLogout = async () => {
   try {
     dispatch(signoutStart());
