@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState } from "react"
 import SearchBar from "./SearchBar/SearchBar"
 import ProfileInfo from "./Cards/ProfileInfo"
 import { Link, useNavigate } from "react-router-dom"
@@ -9,10 +9,6 @@ import { signInSuccess, signoutFailure, signoutStart } from "../redux/user/userS
 
 const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
   const [searchQuery, setSearchQuery] = useState("")
-  const [isRecording, setIsRecording] = useState(false)
-  const [transcribedText, setTranscribedText] = useState("")
-  const recognition = useRef(null)
-
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -27,45 +23,28 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
     handleClearSearch()
   }
 
-const onLogout = async () => {
-  try {
-    dispatch(signoutStart());
-
-    const res = await axios.post(
-      "https://echo-notes-backend.onrender.com/api/auth/signout",  
-      {},  
-      { withCredentials: true }
-    );
-
-    if (res.data.success === false) {
-      dispatch(signoutFailure(res.data.message));
-      toast.error(res.data.message);
-      return;
-    }
-
-    toast.success(res.data.message);
-    dispatch(signInSuccess());
-    navigate("/login");
-  } catch (error) {
-    toast.error(error.message);
-    dispatch(signoutFailure(error.message));
-  }
-};
-
-  const createNote = async () => {
+  const onLogout = async () => {
     try {
-      if (transcribedText.trim()) {
-        const res = await axios.post(
-          "https://echo-notes-backend.onrender.com/api/notes", 
-          { text: transcribedText },
-          { withCredentials: true }
-        );
-        toast.success("Note created successfully!");
-      } else {
-        toast.error("No text transcribed.");
+      dispatch(signoutStart());
+
+      const res = await axios.post(
+        "https://echo-notes-backend.onrender.com/api/auth/signout",  
+        {},  
+        { withCredentials: true }
+      );
+
+      if (res.data.success === false) {
+        dispatch(signoutFailure(res.data.message));
+        toast.error(res.data.message);
+        return;
       }
+
+      toast.success(res.data.message);
+      dispatch(signInSuccess());
+      navigate("/login");
     } catch (error) {
-      toast.error("Error creating note.");
+      toast.error(error.message);
+      dispatch(signoutFailure(error.message));
     }
   };
 
@@ -86,15 +65,6 @@ const onLogout = async () => {
       />
 
       <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
-
-      <div className="ml-4">
-        <button
-          onClick={isRecording ? stopRecording : startRecording}
-          className="p-2 bg-blue-500 text-white rounded"
-        >
-          {isRecording ? "Stop Recording" : "Start Recording"}
-        </button>
-      </div>
     </div>
   );
 };
