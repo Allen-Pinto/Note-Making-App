@@ -25,11 +25,9 @@ app.use(cookieParser());
 
 // Define allowed origins for CORS
 const allowedOrigins = [
-  "https://note-making-app-beige.vercel.app",
-  "https://note-making-a57agu4lm-allen-pintos-projects.vercel.app",
-  "https://note-making-3c533wuqw-allen-pintos-projects.vercel.app",
-  "https://note-making-jz3ddb07k-allen-pintos-projects.vercel.app",
-  "https://note-making-9lesyl1eo-allen-pintos-projects.vercel.app", // Added this missing origin
+  "https://note-making-app-eta.vercel.app", 
+  "https://note-making-app-git-main-allen-pintos-projects.vercel.app",
+  "https://note-making-app-allen-pintos-projects.vercel.app",
 ];
 
 // CORS Options configuration
